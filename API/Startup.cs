@@ -1,6 +1,7 @@
 using API.Data;
 using API.Data.Repositories;
 using API.Services;
+using API.Services.ThirdParty;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,8 @@ namespace API
       services.AddScoped<IDateTimeService, DateTimeService>();
       services.AddScoped<IOrderRepository, OrderRepository>();
       services.AddScoped<ICoffeeService, CoffeeService>();
+      AddOpenWeatherIntegration(services);
+
       services.AddHttpClient();
       services.AddSwaggerGen(c =>
       {
@@ -57,6 +60,14 @@ namespace API
       {
         endpoints.MapControllers();
       });
+    }
+
+    private void AddOpenWeatherIntegration(IServiceCollection services)
+    {
+      OpenWeatherConfig openWeatherConfig = new();
+      _config.GetSection("OpenWeather").Bind(openWeatherConfig);
+      services.AddSingleton(openWeatherConfig);
+      services.AddScoped<IOpenWeatherService, OpenWeatherService>();
     }
   }
 }
